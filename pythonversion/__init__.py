@@ -1,25 +1,60 @@
 import requests
 from bs4 import BeautifulSoup
 
-def extract_data():
-    global python_release
-    try:
-        url = 'https://www.python.org/downloads/'
-        content=requests.get(url)
-    except Exception:
-        return None
 
-    if content.status_code == 200:
-        soup=BeautifulSoup(content.text, 'html.parser')
+url = "https://www.python.org/downloads/"
+link_download = "https://www.python.org"
+link_notes = "https://docs.python.org"
+req = requests.get(url)
+print(req)
 
-        result=soup.find('div', {'class': 'row download-list-widget'})
-        result=result.findChildren('li')
 
-        i = 1
-        for res in result:
-            #print(i, res.text)
+def get_relese_version():
+    soup = BeautifulSoup(req.content, 'html.parser')
+    release_versions = soup.find_all('span', 'release-number')
+    for release_version in release_versions:
+        print(release_version.text)
 
-def show_data(result):  # mendefinisikan fungsi tampilkan data
-    if result is None:
-        print("Tidak bisa menemukan data")
-    print (result)
+
+def get_relese_date():
+    soup = BeautifulSoup(req.content, 'html.parser')
+    release_dates = soup.find_all('span', 'release-date')
+    for release_date in release_dates:
+        print(release_date.text)
+
+
+def get_link_download():
+    soup = BeautifulSoup(req.content, 'html.parser')
+    downloads = soup.find_all('span', 'release-download')
+
+    for download in downloads:
+        links = download.find_all('a')
+        for links_tag in links:
+            try:
+                full_link = link_download+links_tag['href']
+            except:
+                full_link = "Link is not available"
+            print(full_link)
+
+
+def get_link_notes():
+    soup = BeautifulSoup(req.content, 'html.parser')
+    notes = soup.find_all('span', 'release-enhancements')
+
+    for note in notes:
+        links_notes = note.find_all('a')
+        for links_tag_notes in links_notes:
+            try:
+                full_link_notes = link_notes+links_tag_notes['href']
+            except:
+                full_link_notes = "Link is not available"
+            print(full_link_notes)
+
+
+if __name__ == '__main__':
+    get_relese_version()
+    get_relese_date()
+    get_link_download()
+    get_link_notes()
+
+    
